@@ -1,0 +1,128 @@
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+	 <meta charset="UTF-8">
+	 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	 <style>
+	     body {
+	         font-family: Arial, sans-serif;
+	     }
+	     .chat-container {
+	         width: 300px;
+	         height: 350px;
+	         border: 1px solid #ccc;
+	         overflow-y: scroll;
+	         padding: 10px;
+	     }
+	     .message {
+	         margin-bottom: 10px;
+	         clear: both; /* 清除浮动 */
+	     }
+	     .user-message {
+	         background-color: #e0f7fa;
+	         padding: 5px;
+	         border-radius: 5px;
+	         float: left; /* 用户消息在左边 */
+	     }
+	     .bot-message {
+	         background-color: #f5f5f5;
+	         padding: 5px;
+	         border-radius: 5px;
+	         float: right; /* 机器人消息在右边 */
+	     }
+	     .input-container {
+	         margin-top: 10px;
+	     }
+	     .input-container input {
+	         width: 70%;
+	         padding: 5px;
+	     }
+	     .input-container button {
+	         width: 20%;
+	         padding: 5px;
+	     }
+	     .avatar {
+	         width: 30px;
+	         height: 30px;
+	         border-radius: 50%; /* 使头像为圆形 */
+	         margin-right: 5px; /* 头像和文本之间的间距 */
+	         float: left; /* 头像在左边 */
+	     }
+	     .bot-avatar {
+	         background-color: #ccc; /* 机器人头像的背景颜色 */
+	     }
+	     .user-avatar {
+	         background-color: #4caf50; /* 用户头像的背景颜色 */
+	     }
+	 </style>
+	 <title>Chat Interface</title>
+	</head>
+	<body>
+	 <div class="chat-container" id="chatContainer">
+	     <!-- 对话内容将在这里动态添加 -->
+	 </div>
+	 <div class="input-container">
+	     <input type="text" id="userInput" placeholder="输入消息...">
+	     <button onclick="sendMessage()">发送</button>
+	 </div>
+	 <script>
+	     // 处理用户发送的消息
+	     function sendMessage() {
+	         const userInput = document.getElementById('userInput');
+	         const message = userInput.value;
+	         if (message.trim() !== '') {
+	             userMessage(message);
+	             // 发送HTTP POST请求到你的API
+	             fetch('http://127.0.0.1:5000/chat', {
+	                 method: 'POST',
+	                 headers: {
+	                     'Content-Type': 'application/json'
+	                 },
+	                 body: JSON.stringify({ message: message })
+	             })
+	             .then(response => response.json())
+	             .then(data => {
+	                 // 显示机器人的回复
+	                 if (data.message) {
+	                     botReply(data.message);
+	                 } else {
+	                     botReply("错误: 无法获取回复");
+	                 }
+	             })
+	             .catch(error => {
+	                 console.error('Error:', error);
+	                 botReply("错误: " + error);
+	             });
+	             userInput.value = ''; // 清空输入框
+	         }
+	     }
+	     // 模拟机器人回复
+	     function botReply(message) {
+	         const chatContainer = document.getElementById('chatContainer');
+	         const botMessage = document.createElement('div');
+	         const botAvatar = document.createElement('div');
+	         botAvatar.classList.add('avatar', 'bot-avatar');
+	         botMessage.classList.add('message', 'bot-message');
+	         botMessage.innerText = message;
+	         botMessage.insertBefore(botAvatar, botMessage.firstChild);
+	         chatContainer.appendChild(botMessage);
+	         chatContainer.scrollTop = chatContainer.scrollHeight; // 滚动到底部
+	     }
+	     // 模拟用户发送消息
+	     function userMessage(message) {
+	         const chatContainer = document.getElementById('chatContainer');
+	         const userMessage = document.createElement('div');
+	         const userAvatar = document.createElement('div');
+	         userAvatar.classList.add('avatar', 'user-avatar');
+	         userMessage.classList.add('message', 'user-message');
+	         userMessage.innerText = message;
+	         userMessage.insertBefore(userAvatar, userMessage.firstChild);
+	         chatContainer.appendChild(userMessage);
+	         chatContainer.scrollTop = chatContainer.scrollHeight; // 滚动到底部
+	     }
+	     // 添加一些示例消息
+	     userMessage('你好，机器人！');
+	     botReply('你好，有什么可以帮助你的吗？');
+	 </script>
+	</body>
+	</html>

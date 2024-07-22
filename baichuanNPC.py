@@ -6,7 +6,7 @@ import json
 
 def do_request():
     url = "https://api.baichuan-ai.com/v1/chat/completions"
-    api_key = "sk-3849478cf16e019d3cf7618db0f116e4"
+    api_key = ""
 
     data = {
         "model": "Baichuan-NPC-Turbo",
